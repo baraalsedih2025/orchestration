@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  ml-worker-0:
+    image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-devel
+    container_name: ml-worker-0
+    working_dir: /app
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=0
+      - LOCAL_RANK=0
+      - SLURM_PROCID=0
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=0
+      - SLURM_JOB_ID=001
+      - SLURM_JOB_NAME=demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+      - ./slurm_training_demo.py:/app/slurm_training_demo.py
+      - ./config.json:/app/config.json
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - ml-network
+    command: bash -c "pip install -r requirements.txt && python3 slurm_training_demo.py --config config.json"
+
+  ml-worker-1:
+    image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-devel
+    container_name: ml-worker-1
+    depends_on:
+      - ml-worker-0
+    working_dir: /app
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=1
+      - LOCAL_RANK=0
+      - SLURM_PROCID=1
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=1
+      - SLURM_JOB_ID=001
+      - SLURM_JOB_NAME=demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+      - ./slurm_training_demo.py:/app/slurm_training_demo.py
+      - ./config.json:/app/config.json
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - ml-network
+    command: bash -c "pip install -r requirements.txt && python3 slurm_training_demo.py --config config.json"
+
+  ml-worker-2:
+    image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-devel
+    container_name: ml-worker-2
+    depends_on:
+      - ml-worker-0
+    working_dir: /app
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=2
+      - LOCAL_RANK=0
+      - SLURM_PROCID=2
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=2
+      - SLURM_JOB_ID=001
+      - SLURM_JOB_NAME=demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+      - ./slurm_training_demo.py:/app/slurm_training_demo.py
+      - ./config.json:/app/config.json
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - ml-network
+    command: bash -c "pip install -r requirements.txt && python3 slurm_training_demo.py --config config.json"
+
+  ml-worker-3:
+    image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-devel
+    container_name: ml-worker-3
+    depends_on:
+      - ml-worker-0
+    working_dir: /app
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=3
+      - LOCAL_RANK=0
+      - SLURM_PROCID=3
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=3
+      - SLURM_JOB_ID=001
+      - SLURM_JOB_NAME=demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+      - ./slurm_training_demo.py:/app/slurm_training_demo.py
+      - ./config.json:/app/config.json
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - ml-network
+    command: bash -c "pip install -r requirements.txt && python3 slurm_training_demo.py --config config.json"
+
+networks:
+  ml-network:
+    driver: bridge

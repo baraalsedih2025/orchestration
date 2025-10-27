@@ -1,0 +1,39 @@
+FROM docker:dind
+
+# Install Python and required tools
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    bash \
+    curl \
+    git
+
+# Install docker-compose
+RUN pip3 install docker-compose --break-system-packages
+
+# Set working directory
+WORKDIR /app
+
+# Copy docker-compose file
+COPY docker-compose-simple.yml docker-compose.yml
+COPY Dockerfile .
+
+# Copy application files
+COPY slurm_training_demo.py .
+COPY config.json .
+COPY requirements.txt .
+
+# Set environment variables
+ENV PYTHONPATH=/app
+
+# Start script
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'echo "Starting Docker daemon..."' >> /start.sh && \
+    echo 'dockerd &' >> /start.sh && \
+    echo 'sleep 10' >> /start.sh && \
+    echo 'echo "Docker daemon started"' >> /start.sh && \
+    echo 'cd /app && docker-compose up --build --abort-on-container-exit' >> /start.sh && \
+    chmod +x /start.sh
+
+CMD ["/start.sh"]
+

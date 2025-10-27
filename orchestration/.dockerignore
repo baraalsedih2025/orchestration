@@ -1,0 +1,12 @@
+# Exclude unnecessary files from Docker build
+checkpoints/
+data/
+logs/
+__pycache__/
+*.pyc
+*.pyo
+*.pth
+.env
+.git/
+*.md
+requirement*.txt.bak

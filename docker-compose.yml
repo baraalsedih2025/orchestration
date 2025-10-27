@@ -1,0 +1,152 @@
+services:
+  # Worker 0 (Master)
+  ml-worker-0:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml-worker-0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=0
+      - LOCAL_RANK=0
+      - SLURM_PROCID=0
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=0
+      - SLURM_JOB_ID=docker-job-001
+      - SLURM_JOB_NAME=ml_training_demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+    networks:
+      - ml-network
+    command: ["python3", "slurm_training_demo.py", "--config", "config.json"]
+
+  # Worker 1
+  ml-worker-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml-worker-1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=1
+      - LOCAL_RANK=0
+      - SLURM_PROCID=1
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=1
+      - SLURM_JOB_ID=docker-job-001
+      - SLURM_JOB_NAME=ml_training_demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+      - NVIDIA_VISIBLE_DEVICES=1
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+    networks:
+      - ml-network
+    command: ["sh", "-c", "sleep 10 && python3 slurm_training_demo.py --config config.json"]
+    depends_on:
+      - ml-worker-0
+
+  # Worker 2
+  ml-worker-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml-worker-2
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=2
+      - LOCAL_RANK=0
+      - SLURM_PROCID=2
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=2
+      - SLURM_JOB_ID=docker-job-001
+      - SLURM_JOB_NAME=ml_training_demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+      - NVIDIA_VISIBLE_DEVICES=2
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+    networks:
+      - ml-network
+    command: ["sh", "-c", "sleep 10 && python3 slurm_training_demo.py --config config.json"]
+    depends_on:
+      - ml-worker-0
+
+  # Worker 3
+  ml-worker-3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml-worker-3
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - MASTER_ADDR=ml-worker-0
+      - MASTER_PORT=12355
+      - WORLD_SIZE=4
+      - RANK=3
+      - LOCAL_RANK=0
+      - SLURM_PROCID=3
+      - SLURM_LOCALID=0
+      - SLURM_NTASKS=4
+      - SLURM_NODEID=3
+      - SLURM_JOB_ID=docker-job-001
+      - SLURM_JOB_NAME=ml_training_demo
+      - SLURM_JOB_NODELIST=ml-worker-0,ml-worker-1,ml-worker-2,ml-worker-3
+      - NVIDIA_VISIBLE_DEVICES=3
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./logs:/app/logs
+    networks:
+      - ml-network
+    command: ["sh", "-c", "sleep 10 && python3 slurm_training_demo.py --config config.json"]
+    depends_on:
+      - ml-worker-0
+
+networks:
+  ml-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
