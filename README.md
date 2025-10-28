@@ -2,6 +2,11 @@
 
 Run distributed training across **4 Docker containers**, each acting as a separate machine with its own GPU, using PyTorch DDP (Distributed Data Parallel).
 
+## 📌 Different Permission Levels?
+
+**If your mentor has Docker permissions but you don't**, see:
+👉 **[WORKFLOW_SEPARATED_PERMISSIONS.md](WORKFLOW_SEPARATED_PERMISSIONS.md)** - Complete guide for separated permissions
+
 ## 🎯 What This Does
 
 ```
